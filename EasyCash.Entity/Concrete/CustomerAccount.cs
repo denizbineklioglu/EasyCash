@@ -12,6 +12,7 @@ namespace EasyCash.Entity.Concrete
         public string Number { get; set; }
         public string Currency { get; set; }
         public decimal Balance { get; set; }
-        public string BankBranch { get; set; }        
+        public string BankBranch { get; set; }
+        public int AppUserID { get; set; }
     }
 }

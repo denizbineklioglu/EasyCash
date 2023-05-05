@@ -19,4 +19,9 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\EasyCash.DataAccess\EasyCash.DataAccess.csproj" />
+    <ProjectReference Include="..\EasyCash.Entity\EasyCash.Entity.csproj" />
+  </ItemGroup>
+
 </Project>
