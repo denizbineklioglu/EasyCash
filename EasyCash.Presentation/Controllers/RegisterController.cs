@@ -1,7 +1,9 @@
 ﻿using EasyCash.DTO.Dtos.AppUserDtos;
 using EasyCash.Entity.Concrete;
+using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using MimeKit;
 
 namespace EasyCash.Presentation.Controllers
 {
@@ -25,21 +27,63 @@ namespace EasyCash.Presentation.Controllers
         {
             if (ModelState.IsValid)
             {
+                Random random = new Random();
+                int code = random.Next(100000, 1000000);
                 AppUser appUser = new AppUser()
                 {
                     UserName = model.Username,
                     Name = model.Name,
                     Surname = model.Surname,
                     Email = model.Email,
+                    City = "aaa",
+                    District = "bbb",
+                    ImageUrl = "ccc",
+                    ConfirmCode = code
                 };
 
                 var result = await _userManager.CreateAsync(appUser, model.Password);
                 if (result.Succeeded)
                 {
+                    MimeMessage mimeMessage = new MimeMessage();
+                    MailboxAddress mailboxFrom = new MailboxAddress("Easy Cash Admin", "anilsakar001@gmail.com");
+                    MailboxAddress mailboxTo = new MailboxAddress("User", appUser.Email);
+
+                    mimeMessage.From.Add(mailboxFrom);
+                    mimeMessage.To.Add(mailboxTo);
+
+                    var bodyBuilder = new BodyBuilder();
+                    bodyBuilder.TextBody = "Kayıt işlemini gerçekleştirmek için onay kodunuz: " + code;
+                    mimeMessage.Body = bodyBuilder.ToMessageBody();
+
+                    mimeMessage.Subject = "Easy Cash Onay Kodu";
+
+                    SmtpClient client = new SmtpClient();
+                    client.Connect("smtp.gmail.com",587,false);
+                    client.Authenticate("anilsakar001@gmail.com", "qolfdiidarbiujsc");
+                    client.Send(mimeMessage);
+                    client.Disconnect(true);
+
                     return RedirectToAction("Index","ConfirmMail");
+                }
+                else
+                {
+                    foreach (var item in result.Errors)
+                    {
+                        ModelState.AddModelError("", item.Description);
+                    }
                 }
             }
             return View();
         }
     }
 }
+
+/*
+    Identity'de şifre oluşturmak için gerekenler
+        - En az 6 karakter. 
+        - En az 1 küçük harf.
+        - En az 1 büyük harf.
+        - En az 1 sembol
+        - En az 1 sayı
+    içermelidir.
+ */
