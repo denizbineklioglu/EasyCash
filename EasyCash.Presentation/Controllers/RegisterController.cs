@@ -63,6 +63,8 @@ namespace EasyCash.Presentation.Controllers
                     client.Send(mimeMessage);
                     client.Disconnect(true);
 
+                    TempData["Mail"] = model.Email;
+
                     return RedirectToAction("Index","ConfirmMail");
                 }
                 else
