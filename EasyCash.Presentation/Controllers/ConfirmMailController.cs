@@ -29,7 +29,11 @@ namespace EasyCash.Presentation.Controllers
 			var user = await _userManager.FindByEmailAsync(model.Mail);
 			if (user.ConfirmCode == model.ConfirmCode ) 
 			{
-				return RedirectToAction("Index","MyProfile");
+
+				user.EmailConfirmed = true;
+				await _userManager.UpdateAsync(user);
+
+				return RedirectToAction("Index","Login");
 			}
 
             return View();
